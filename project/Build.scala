@@ -69,7 +69,7 @@ object Compiler {
       case _ => scalacOptions.value ++ defaultCompilerSwitches
     }},
 
-    ThisBuild / scalaVersion := Versions.Scala,
+    scalaVersion in ThisBuild := Versions.Scala,
 
     crossScalaVersions := Versions.ScalaCross
   )
@@ -78,7 +78,7 @@ object Compiler {
 
 object Publish {
   val defaultSettings = Seq(
-    Test / publishArtifact := false
+    publishArtifact in Test := false
   )
 }
 
@@ -97,8 +97,8 @@ object Formatting {
 
   lazy val defaultSettings = Seq(
     ScalariformKeys.autoformat := false,
-    Compile / ScalariformKeys.preferences := defaultPreferences,
-    Test / ScalariformKeys.preferences := defaultPreferences
+    ScalariformKeys.preferences in Compile := defaultPreferences,
+    ScalariformKeys.preferences in Test := defaultPreferences
   )
 
   val defaultPreferences = {
@@ -124,9 +124,9 @@ object Formatting {
 
 object Console {
   val defaultSettings = Seq(
-  Compile / console / scalacOptions ~= (_ filterNot (Set("-Xfatal-warnings", "-Ywarn-unused-import").contains)),
+  scalacOptions in (Compile, console) ~= (_ filterNot (Set("-Xfatal-warnings", "-Ywarn-unused-import").contains)),
 
-  console / initialCommands := """
+  initialCommands in console := """
      import scala.language.postfixOps,
          squants._,
          squants.energy._,
@@ -201,8 +201,8 @@ object Console {
 object Docs {
   private def gitHash = sys.process.Process("git rev-parse HEAD").lineStream_!.head
   val defaultSettings = Seq(
-    Compile / doc / scalacOptions ++= {
-      val (bd, v) = ((LocalRootProject / baseDirectory).value, version.value)
+    scalacOptions in (Compile, doc) ++= {
+      val (bd, v) = ((baseDirectory in LocalRootProject).value, version.value)
       val tagOrBranch = if(v endsWith "SNAPSHOT") gitHash else "v" + v
       Seq("-sourcepath", bd.getAbsolutePath, "-doc-source-url", "https://github.com/garyKeorkunian/squants/tree/" + tagOrBranch + "€{FILE_PATH}.scala")
     },

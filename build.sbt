@@ -40,9 +40,9 @@ lazy val squants =
   )
   .jvmSettings(Tests.defaultSettings: _*)
   .jsSettings(
-    skip in test := isDotty.value,
-    parallelExecution in Test := false,
-    excludeFilter in Test := "*Serializer.scala" || "*SerializerSpec.scala",
+    test / skip := isDotty.value,
+    Test / parallelExecution := false,
+    Test / excludeFilter := "*Serializer.scala" || "*SerializerSpec.scala",
     Test / sources := { if (isDotty.value) Seq() else (Test / sources).value }
   )
   .jsSettings(libraryDependencies ++= { if (isDotty.value) Seq() else Dependencies.scalaTest.value ++ Dependencies.scalaCheck.value})
