@@ -57,9 +57,7 @@ object Compiler {
     "-deprecation",
     "-encoding", "UTF-8",       // yes, this is 2 args
     "-Xfatal-warnings",
-    "-unchecked",
-    // "-Xfuture",
-    // "-Ywarn-dead-code"
+    "-unchecked"
   )
 
   lazy val defaultSettings = Seq(
@@ -69,7 +67,7 @@ object Compiler {
       case _ => scalacOptions.value ++ defaultCompilerSwitches
     }},
 
-    scalaVersion in ThisBuild := Versions.Scala,
+    ThisBuild / scalaVersion := Versions.Scala,
 
     crossScalaVersions := Versions.ScalaCross
   )
@@ -78,7 +76,7 @@ object Compiler {
 
 object Publish {
   val defaultSettings = Seq(
-    publishArtifact in Test := false
+    Test / publishArtifact := false
   )
 }
 
@@ -97,8 +95,8 @@ object Formatting {
 
   lazy val defaultSettings = Seq(
     ScalariformKeys.autoformat := false,
-    ScalariformKeys.preferences in Compile := defaultPreferences,
-    ScalariformKeys.preferences in Test := defaultPreferences
+    Compile / ScalariformKeys.preferences := defaultPreferences,
+    Test / ScalariformKeys.preferences := defaultPreferences
   )
 
   val defaultPreferences = {
@@ -124,9 +122,9 @@ object Formatting {
 
 object Console {
   val defaultSettings = Seq(
-  scalacOptions in (Compile, console) ~= (_ filterNot (Set("-Xfatal-warnings", "-Ywarn-unused-import").contains)),
+  Compile / console / scalacOptions ~= (_ filterNot (Set("-Xfatal-warnings", "-Ywarn-unused-import").contains)),
 
-  initialCommands in console := """
+  console / initialCommands := """
      import scala.language.postfixOps,
          squants._,
          squants.energy._,
@@ -201,8 +199,8 @@ object Console {
 object Docs {
   private def gitHash = sys.process.Process("git rev-parse HEAD").lineStream_!.head
   val defaultSettings = Seq(
-    scalacOptions in (Compile, doc) ++= {
-      val (bd, v) = ((baseDirectory in LocalRootProject).value, version.value)
+    Compile / doc / scalacOptions ++= {
+      val (bd, v) = ((LocalRootProject / baseDirectory).value, version.value)
       val tagOrBranch = if(v endsWith "SNAPSHOT") gitHash else "v" + v
       Seq("-sourcepath", bd.getAbsolutePath, "-doc-source-url", "https://github.com/garyKeorkunian/squants/tree/" + tagOrBranch + "€{FILE_PATH}.scala")
     },
